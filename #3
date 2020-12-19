@@ -1,0 +1,57 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Diskr_dz_2._3
+{
+    class Program
+    {
+        static void MatrixOutput(int[,] graf, int n)
+        {
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    Console.Write(graf[i,j] + " ");
+                }
+                Console.WriteLine();
+            }
+            Console.WriteLine();
+        }
+        static void Main(string[] args)
+        {
+            int n;
+            bool flag = true;
+            Console.Write("Кол-во вершин: ");
+            n = Convert.ToInt32(Console.ReadLine());
+            int[,] graf1 = new int[n,n];
+            int[,] graf2 = new int[n,n];
+            Console.WriteLine("Матрица смежности вершин граф 1: ");
+            for (int i = 0; i < n; i++)
+                for (int j = 0; j < n; j++)
+                    graf1[i,j]= Convert.ToInt32(Console.ReadLine());
+            Console.WriteLine("Матрица смежности вершин граф 2: ");
+            for (int i = 0; i < n; i++)
+                for (int j = 0; j < n; j++)
+                    graf2[i, j] = Convert.ToInt32(Console.ReadLine());
+            Console.Clear();
+            MatrixOutput(graf1, n);
+            MatrixOutput(graf2, n);
+
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                    if (graf1[i, j] != graf2[i, j])
+                    {
+                        flag = false;
+                        break;
+                    }
+            }
+            if (flag) Console.WriteLine("Преобразование является автоморфизмом.");
+            else Console.WriteLine("Преобразование не является автоморфизмом.");
+            Console.ReadKey();
+        }
+    }
+}
