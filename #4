@@ -1,0 +1,111 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Diskr_dz_2._4
+{
+
+    class Program
+    {
+        static void MatrixOutput(int[,] matrix, int n)
+        {
+            Console.WriteLine("Матрица: ");
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    Console.Write(matrix[i,j] + " ");
+                }
+                Console.WriteLine();
+            }
+            for (int i = 0; i < n; i++)
+                Console.Write("_ ");
+            Console.WriteLine();
+        }
+        static bool MatrixSravnenie(int[,] matrixSmej, int[,] matrixSmejBasic, int[] perestanovka, int n)
+        {
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    if (matrixSmejBasic[i, j] == 1) matrixSmej[perestanovka[i], perestanovka[j]] = 1;
+                    if (matrixSmejBasic[i, j] == 0) matrixSmej[perestanovka[i], perestanovka[j]] = 0;
+                }
+            }
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    if (matrixSmejBasic[i, j] != matrixSmej[i, j]) return false;
+                }
+            }
+            return true;
+        }
+        static bool UsingPerestanovki(int[] perestanovki, int[] result, int n)
+        {
+            for (int i = 0; i < n; i++)
+            {
+                result[i] = perestanovki[perestanovki[i]];
+            }
+            for (int i = 0; i < n; i++)
+            {
+                if (result[i] != i) { return false; }
+            }
+            return true;
+        }
+        static void GenerationPerestanovki(int n, bool[] flag, int[] razm, int[] result, int el_now, int[,] matrixSmej, int[,] matrixSmejBasic)
+        {
+            if (el_now == n)
+            {
+                if (UsingPerestanovki(razm, result, n) && MatrixSravnenie(matrixSmej, matrixSmejBasic, razm, n))
+                {
+                    for (int i = 0; i < n; i++)
+                    {
+                        Console.Write("{0} ", razm[i]);
+                    }
+                    Console.WriteLine("");
+                }
+
+            }
+            else
+                for (int i = 0; i < n; i++)
+                {
+                    if (flag[i] == false)
+                    {
+                        razm[el_now] = i;
+                        flag[i] = true;
+                        GenerationPerestanovki(n, flag, razm, result, el_now + 1, matrixSmej, matrixSmejBasic);
+                        flag[i] = false;
+                    }
+                }
+        }
+        static void Main(string[] args)
+        {
+            int n;
+            Console.Write("Введите кол-во вершин: ");
+            n = Convert.ToInt32(Console.ReadLine());
+            int[] result = new int[n];
+            int[] razm = new int[n];
+            bool[] flag = new bool[n];
+            int[,] matrixSmej = new int[n, n];
+            int[,] matrixSmejBasic = new int[n, n];
+            Console.WriteLine("Введите матрицу смежности вершин: ");
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    matrixSmejBasic[i,j] = Convert.ToInt32(Console.ReadLine());
+                }
+            }
+            for (int i = 0; i < n; i++)
+                flag[i] = false;
+            int[] razm1 = new int[4] { 0, 3, 2, 1 };
+            Console.Clear();
+            Console.WriteLine("Автоморфизмы: ");
+            GenerationPerestanovki(n, flag, razm, result, 0, matrixSmej, matrixSmejBasic);
+            Console.ReadKey();
+        }
+    }
+}
