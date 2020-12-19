@@ -1,0 +1,147 @@
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.IO;
+
+namespace Diskr_12
+{
+    class Program
+    {
+        static void AllPairsOfPoints(int k_razm, int n, bool[] flagAddedPoint, int[] alph, int[] sochet, int[,] pairsOfPoints, int el_now, ref int k)
+        {
+            if (el_now == k_razm)
+            {
+                for (int i = 0; i < k_razm; i++)
+                {
+                    pairsOfPoints[k, i] = sochet[i];
+                }
+                k++;
+            }
+            else
+                for (int i = 0; i < n; i++)
+                {
+                    if (flagAddedPoint[i] == false)
+                    {
+                        //Console.WriteLine("{0}",  el_now);
+                        //Console.WriteLine("alph[{1}]{0}", alph[i], i) ;
+                        sochet[el_now] = alph[i];
+                        flagAddedPoint[i] = true;
+                        AllPairsOfPoints(k_razm, n, flagAddedPoint, alph, sochet, pairsOfPoints, el_now + 1, ref k);
+                        flagAddedPoint[i] = false;
+                    }
+                }
+        }
+        static void KolOfSochet(int k_razm, int n, bool[] flag_added_point, int el_now, ref int k)
+        {
+            if (el_now == k_razm)
+            {
+                k++;
+            }
+            else
+                for (int i = 0; i < n; i++)
+                {
+                    if (flag_added_point[i] == false)
+                    {
+                        flag_added_point[i] = true;
+                        KolOfSochet(k_razm, n, flag_added_point, el_now + 1, ref k);
+                        flag_added_point[i] = false;
+                    }
+                }
+        } //Находит количество размещений k.
+        static void func1(int k_razm, int n, bool[] flag_added_point, int[,] pairsOfPoints, int[] sochet, int el_now, int xz, bool[,] matrixSmej, StreamWriter wrt, int matrIndex, ref int k)
+        {
+            bool flag_check = true;
+            if (el_now == k_razm)
+            {
+                for (int i = 0; i < k_razm; i++)
+                {
+                    matrixSmej[pairsOfPoints[sochet[i], 0], pairsOfPoints[sochet[i], 1]] = true;
+                }
+                for (int i = 0; i < matrIndex; i++)
+                {
+                    for (int j = 0; j < matrIndex; j++)
+                    {
+                        if (matrixSmej[i, j] && matrixSmej[j, i])
+                        {
+                            matrixSmej[i, j] = false;
+                            matrixSmej[j, i] = false;
+                            flag_check = false;
+                        }
+                    }
+                }
+                if (flag_check)
+                {
+                    k++;
+                    wrt.WriteLine(k + ")");
+                    for (int i = 0; i < matrIndex; i++)
+                    {
+                        for (int j = 0; j < matrIndex; j++)
+                        {
+                            if (matrixSmej[i, j])
+                            {
+                                matrixSmej[i, j] = false;
+                                wrt.Write("1 ");
+                            }
+                            else wrt.Write("0 ");
+                        }
+                        wrt.WriteLine();
+                    }
+                    wrt.WriteLine();
+                }
+            }
+            else
+                for (int i = xz; i < n; i++)
+                {
+                    if (flag_added_point[i] == false)
+                    {
+                        //Console.WriteLine("{0}",  el_now);
+                        //Console.WriteLine("alph[{1}]{0}", alph[i], i) ;
+                        sochet[el_now] = i;
+                        flag_added_point[i] = true;
+                        func1(k_razm, n, flag_added_point, pairsOfPoints, sochet, el_now + 1, i, matrixSmej, wrt, matrIndex, ref k);
+                        flag_added_point[i] = false;
+                    }
+                }
+        }
+
+        static void Main(string[] args)
+        {
+            StreamWriter wrt = new StreamWriter("Output.txt");
+            int count = 0;
+            int n, m;
+            int kolOfSochet;
+            Console.Write("p: ");
+            n = Convert.ToInt32(Console.ReadLine());
+            Console.Write("q: ");
+            kolOfSochet = Convert.ToInt32(Console.ReadLine());
+            int[] alph = new int[n];
+            int[] razm = new int[kolOfSochet];
+            bool[,] matrixSmej = new bool[n, n];
+            for (int i = 0; i < n; i++)
+            {
+                alph[i] = i;
+            }
+            for (int i = 0; i < n; i++)
+                for (int j = 0; j < n; j++)
+                    matrixSmej[i, j] = false;
+            bool[] flagAddedPoint = new bool[n];
+            for (int i = 0; i < n; i++)
+                flagAddedPoint[i] = false;
+
+            KolOfSochet(2, n, flagAddedPoint, 0, ref count);
+            int[,] pairsOfPoints = new int[count, 2];
+            m = count;
+            count = 0;
+
+            AllPairsOfPoints(2, n, flagAddedPoint, alph, razm, pairsOfPoints, 0, ref count);
+            count = 0;
+
+            bool[] flag_added_point_1 = new bool[m];
+            func1(kolOfSochet, m, flag_added_point_1, pairsOfPoints, razm, 0, 0, matrixSmej, wrt, n, ref count);
+            wrt.Close();
+        }
+    }
+}
