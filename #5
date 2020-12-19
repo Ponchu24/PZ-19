@@ -1,0 +1,207 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Diskr_dz_2._5
+{
+
+    class Program
+    {
+        static void MatrixOutput(int[,] matrix, int n)
+        {
+            Console.WriteLine("Матрица: ");
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    Console.Write(matrix[i, j] + " ");
+                }
+                Console.WriteLine();
+            }
+            for (int i = 0; i < n; i++)
+                Console.Write("_ ");
+            Console.WriteLine();
+        }
+        static void MatrixOutputPerestanovki(int[,] matrixBasic, int[,] matrix, int[,] perestanovka, int n, int l)
+        {
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    if (matrixBasic[i, j] == 1) matrix[perestanovka[l,i], perestanovka[l,j]] = 1;
+                    if (matrixBasic[i, j] == 0) matrix[perestanovka[l,i], perestanovka[l,j]] = 0;
+                }
+            }
+            Console.WriteLine("Матрица: ");
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    Console.Write(matrix[i, j] + " ");
+                }
+                Console.WriteLine();
+            }
+            for (int i = 0; i < n; i++)
+                Console.Write("_ ");
+            Console.WriteLine();
+        }
+        static bool MatrixSravnenie(int[,] matrixSmej, int[,] matrixSmejBasic, int[] perestanovka, int n)
+        {
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    if (matrixSmejBasic[i, j] == 1) matrixSmej[perestanovka[i], perestanovka[j]] = 1;
+                    if (matrixSmejBasic[i, j] == 0) matrixSmej[perestanovka[i], perestanovka[j]] = 0;
+                }
+            }
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    if (matrixSmejBasic[i, j] != matrixSmej[i, j]) return false;
+                }
+            }
+            return true;
+        }
+        static bool MatrixSravnenie2(int[,] matrixSmej1, int[,] matrixSmej2, int[,] matrixSmejBasic, int[] razm, int[,]metkiGrafa, int n, int l)
+        {
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    if (matrixSmejBasic[i, j] == 1) matrixSmej1[razm[i], razm[j]] = 1;
+                    if (matrixSmejBasic[i, j] == 0) matrixSmej1[razm[i], razm[j]] = 0;
+                }
+            }
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    if (matrixSmejBasic[i, j] == 1) matrixSmej2[metkiGrafa[l,i], metkiGrafa[l, j]] = 1;
+                    if (matrixSmejBasic[i, j] == 0) matrixSmej2[metkiGrafa[l, i], metkiGrafa[l, j]] = 0;
+                }
+            }
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    if (matrixSmej2[i, j] != matrixSmej1[i, j]) return true;
+                }
+            }
+            return false;
+        }
+        static bool UsingPerestanovki(int[] perestanovki, int[] result, int n)
+        {
+            for (int i = 0; i < n; i++)
+            {
+                result[i] = perestanovki[perestanovki[i]];
+            }
+            for (int i = 0; i < n; i++)
+            {
+                if (result[i] != i) { return false; }
+            }
+            return true;
+        }
+        static int Factorial(int n)
+        {
+            int res=1;
+            for (int i = 1; i <= n; i++)
+                res *= i;
+            return res;
+        }
+        static void GenerationPerestanovki(int n, bool[] flag, int[] razm, int[] result, int el_now, int[,] matrixSmej1, int[,] matrixSmej2, int[,] matrixSmejBasic, int[,] metkiGrafa, ref int k)
+        {
+            bool flag_check;
+            if (k == 0) flag_check = true;
+            else flag_check = false;
+            if (el_now == n)
+            {
+                if (UsingPerestanovki(razm, result, n) && !MatrixSravnenie(matrixSmej1, matrixSmejBasic, razm, n))
+                {
+                    for (int i = 0; i < k; i++)
+                    {
+                        if (MatrixSravnenie2(matrixSmej1,matrixSmej2,matrixSmejBasic,razm,metkiGrafa,n,i)) flag_check = true;
+                        else { flag_check = false; break; }
+                    }
+                    if (flag_check)
+                    {
+                        for (int i = 0; i < n; i++)
+                            metkiGrafa[k, i] = razm[i];
+                        k++;
+                    }
+                }
+
+            }
+            else
+                for (int i = 0; i < n; i++)
+                {
+                    if (flag[i] == false)
+                    {
+                        razm[el_now] = i;
+                        flag[i] = true;
+                        GenerationPerestanovki(n, flag, razm, result, el_now + 1, matrixSmej1, matrixSmej2, matrixSmejBasic, metkiGrafa, ref k);
+                        flag[i] = false;
+                    }
+                }
+        }
+        static int KolvoPomechGrafov(int n, bool[] flag, int[] razm, int[] result, int el_now, int[,] matrixSmej, int[,] matrixSmejBasic, ref int k)
+        {
+            if (el_now == n)
+            {
+                if (UsingPerestanovki(razm, result, n) && MatrixSravnenie(matrixSmej, matrixSmejBasic, razm, n))
+                {
+                    k++;
+                }
+
+            }
+            else
+                for (int i = 0; i < n; i++)
+                {
+                    if (flag[i] == false)
+                    {
+                        razm[el_now] = i;
+                        flag[i] = true;
+                        KolvoPomechGrafov(n, flag, razm, result, el_now + 1, matrixSmej, matrixSmejBasic, ref k);
+                        flag[i] = false;
+                    }
+                }
+            return k;
+        }
+        static void Main(string[] args)
+        {
+            int n, k = 0;
+            Console.Write("Введите кол-во вершин: ");
+            n = Convert.ToInt32(Console.ReadLine());
+            int[] result = new int[n];
+            int[] razm = new int[n];
+            bool[] flag = new bool[n];
+            int[,] matrixSmej1 = new int[n, n];
+            int[,] matrixSmej2 = new int[n, n];
+            int[,] matrixSmejBasic = new int[n, n];
+            Console.WriteLine("Введите матрицу смежности вершин: ");
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    matrixSmejBasic[i, j] = Convert.ToInt32(Console.ReadLine());
+                }
+            }
+            for (int i = 0; i < n; i++)
+                flag[i] = false;
+            Console.Clear();
+
+            int[,] metkiGrafa = new int[Factorial(n)/(KolvoPomechGrafov(n, flag, razm, result, 0, matrixSmej1, matrixSmejBasic, ref k)), n];
+            k = 0;
+            GenerationPerestanovki(n, flag, razm, result, 0, matrixSmej1, matrixSmej2, matrixSmejBasic, metkiGrafa, ref k);
+            MatrixOutput(matrixSmejBasic, n);
+            for (int i = 0; i < k; i++)
+            {
+                MatrixOutputPerestanovki(matrixSmejBasic,matrixSmej1,metkiGrafa,n,i);
+            }
+            Console.ReadKey();
+        }
+    }
+}
